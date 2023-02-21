@@ -18,12 +18,6 @@ client.on("connect", function (connect) {
 	connection.sendUTF(`NICK ${process.env.WEBSOCKET_NICK}`);
 	connection.sendUTF(`JOIN #${process.env.WEBSOCKET_NICK}`);
 
-	connection.sendUTF(`PRIVMSG #lyuun_: ""`);
-
-	// let intervalObj = setInterval(() => {
-	// 	connection.sendUTF(`PRIVMSG #lyuun_: ""`);
-	// }, 1000 * 60 * 1);
-
 	connection.on('message', function (message) {
 		if (!message.type === 'utf8')
 			return;
@@ -43,7 +37,7 @@ client.on("connect", function (connect) {
 					nick = parsedMessage.source.nick;
 					message = parsedMessage.parameters.toLowerCase();
 					work.command(channel, nick, message);
-					work.link(channel, nick, message);
+					work.request(channel, nick, message);
 					break;
 				case "JOIN":
 					channel = parsedMessage.command.channel.match(/(\w+)/)[1];
@@ -62,8 +56,6 @@ client.on("connect", function (connect) {
 		console.log(`close reason code: ${connection.closeReasonCode}`);
 	});
 });
-
-
 
 module.exports = {
 	client

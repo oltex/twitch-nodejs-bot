@@ -35,10 +35,10 @@ function host(channel, nick, command, argument) {
 			user.users = user.users.filter(element => element.channel !== channel);
 			break;
 		case "ban_viewbot":
-			_user._enable_ban_viewbot = true;
+			_user._ban_viewbot = true;
 			break;
 		case "~ban_viewbot":
-			_user._enable_ban_viewbot = false;
+			_user._ban_viewbot = false;
 			break;
 		case "osu_account":
 			if ("undefined" === typeof argument)
@@ -68,29 +68,34 @@ function guest(channel, nick, command, argument) {
 			break;
 	}
 }
-const link = function (channel, nick, message) {
+
+const request = function (channel, nick, message) {
 	if (!message.match(/https:\/\/osu.ppy.sh\/beatmapsets\/+/))
 		return;
 	const _user = user.users.find(element => element._channel === channel && true === element._access_osu_account);
 	if ("undefined" === typeof _user)
 		return;
-	bancho.client.getUser(_user._osu_account).sendMessage(message);
+	const promise = puppeteer.request(message);
+	promise.then((value) => {
+		if ("undefined" === typeof value)
+			return;
+		bancho.client.getUser(_user._osu_account).sendMessage(`${nick} requests [${message} ${value}]`);
+	})
 }
 
 const viewbot = function (channel, nick) {
-	// const _user = user.users.find(element => element._channel === channel);
-	// if ("undefined" === typeof _user)
-	// 	return;
-	// if (false === _user._enable_ban_viewbot)
-	// 	return;
-	let promise = puppeteer.viewbot(nick);
+	const _user = user.users.find(element => element._channel === channel);
+	if ("undefined" === typeof _user)
+		return;
+	if (false === _user._ban_viewbot)
+		return;
+	const promise = puppeteer.viewbot(nick);
 	promise.then((value) => {
 		if (true === value)
-			// websocket.connection.sendUTF(`PRIVMSG #${channel} :/ban ${nick}`);
-			websocket.connection.sendUTF(`PRIVMSG #${channel} :${nick}, ${value}`);
+			websocket.connection.sendUTF(`PRIVMSG #${channel} :/ban ${nick}`);
 	})
 }
 
 module.exports = {
-	command, link, viewbot
+	command, request, viewbot
 }
