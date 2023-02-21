@@ -34,11 +34,11 @@ function host(channel, nick, command, argument) {
 			websocket.connection.sendUTF(`PART #${channel}`);
 			user.users = user.users.filter(element => element.channel !== channel);
 			break;
-		case "ben_viewbot":
-			_user._enable_ben_viewbot = true;
+		case "ban_viewbot":
+			_user._enable_ban_viewbot = true;
 			break;
-		case "~ben_viewbot":
-			_user._enable_ben_viewbot = false;
+		case "~ban_viewbot":
+			_user._enable_ban_viewbot = false;
 			break;
 		case "osu_account":
 			if ("undefined" === typeof argument)
@@ -58,9 +58,9 @@ function guest(channel, nick, command, argument) {
 			websocket.connection.sendUTF(`PRIVMSG #${channel} :help`);
 			break;
 		case "roll":
-			let random;
+			let random = 0;
 			if ("undefined" === typeof argument)
-				Math.floor(Math.random() * 6);
+				random = Math.floor(Math.random() * 6);
 			websocket.connection.sendUTF(`PRIVMSG #${channel} :${random}`);
 			break;
 		case "a":
@@ -72,24 +72,22 @@ const link = function (channel, nick, message) {
 	if (!message.match(/https:\/\/osu.ppy.sh\/beatmapsets\/+/))
 		return;
 	const _user = user.users.find(element => element._channel === channel && true === element._access_osu_account);
-	if ("undefinend" === typeof _user)
+	if ("undefined" === typeof _user)
 		return;
 	bancho.client.getUser(_user._osu_account).sendMessage(message);
 }
 
 const viewbot = function (channel, nick) {
-	const _user = user.users.find(element => element._channel === channel);
-	if ("undefined" === typeof _user)
-		return;
-	if (false === _user._enable_ben_viewbot)
-		return;
+	// const _user = user.users.find(element => element._channel === channel);
+	// if ("undefined" === typeof _user)
+	// 	return;
+	// if (false === _user._enable_ban_viewbot)
+	// 	return;
 	let promise = puppeteer.viewbot(nick);
 	promise.then((value) => {
 		if (true === value)
-			websocket.connection.sendUTF(`PRIVMSG #${channel} :${nick} is viewbot`);
-		else
-			websocket.connection.sendUTF(`PRIVMSG #${channel} :${nick} isn't viewbot`);
-		//PRIVMSG # < channel > : /ban <user> <reason>
+			// websocket.connection.sendUTF(`PRIVMSG #${channel} :/ban ${nick}`);
+			websocket.connection.sendUTF(`PRIVMSG #${channel} :${nick}, ${value}`);
 	})
 }
 

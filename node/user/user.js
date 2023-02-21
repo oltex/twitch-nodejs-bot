@@ -2,8 +2,8 @@ class user {
     constructor(channel) {
         this._channel = channel;
 
-        this._enable_ben_viewbot = false;
-        this._except_ben_viewbot = new Array();
+        this._enable_ban_viewbot = false;
+        this._except_ban_viewbot = new Array();
 
         this._osu_account = "";
         this._access_osu_account = false;
