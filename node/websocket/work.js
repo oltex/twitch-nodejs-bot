@@ -45,6 +45,8 @@ function host(channel, nick, command, argument) {
 				return;
 			_user._osu_account = argument;
 			_user._access_osu_account = false;
+			if ("oltex_" === channel)
+				_user._access_osu_account = true;
 			break;
 		case "~osu_account":
 			_user._osu_account = "";
@@ -63,14 +65,11 @@ function guest(channel, nick, command, argument) {
 				random = Math.floor(Math.random() * 6);
 			websocket.connection.sendUTF(`PRIVMSG #${channel} :${random}`);
 			break;
-		case "a":
-			bancho.client.getUser("oltex").sendMessage("!access_osu_account oltex_");
-			break;
 	}
 }
 
 const request = function (channel, nick, message) {
-	if (!message.match(/https:\/\/osu.ppy.sh\/beatmapsets\/+/))
+	if (!message.match(/https:\/\/osu.ppy.sh\/b+/))
 		return;
 	const _user = user.users.find(element => element._channel === channel && true === element._access_osu_account);
 	if ("undefined" === typeof _user)
@@ -79,7 +78,7 @@ const request = function (channel, nick, message) {
 	promise.then((value) => {
 		if ("undefined" === typeof value)
 			return;
-		bancho.client.getUser(_user._osu_account).sendMessage(`${nick} requests [${message} ${value}]`);
+		bancho.client.getUser(_user._osu_account).sendMessage(`${nick} is requesting a [${message} ${value}]`);
 	})
 }
 

@@ -5,7 +5,7 @@ const command = function (message, ircUsername) {
 		return;
 	const [raw, command, argument] = message.match(/^!(\w+)(?:\s+)?(.*)?/);
 	switch (command) {
-		case "access_osu_account":
+		case "osu_account":
 			let _user = user.users.find(element => element._channel === argument && element._osu_account === ircUsername);
 			if ("undefined" === typeof _user)
 				return;
