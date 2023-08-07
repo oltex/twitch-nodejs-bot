@@ -1,1 +1,1 @@
-require("./node/websocket/websocket.js");
+require("./node/twitch/irc.js");
